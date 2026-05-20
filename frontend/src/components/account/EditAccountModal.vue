@@ -2985,11 +2985,8 @@ const syncFormFromAccount = (newAccount: Account | null) => {
     // Load model mappings and detect mode
     if (newAccount.platform === 'kiro') {
       const existingMappings = credentials.model_mapping as Record<string, string> | undefined
-      if (existingMappings && typeof existingMappings === 'object') {
-        const entries = Object.entries(existingMappings)
-        modelRestrictionMode.value = 'mapping'
-        modelMappings.value = entries.map(([from, to]) => ({ from, to }))
-        allowedModels.value = []
+      if (existingMappings && typeof existingMappings === 'object' && Object.keys(existingMappings).length > 0) {
+        applyKiroModelMappings(Object.entries(existingMappings))
       } else {
         fetchKiroDefaultMappings().then(mappings => {
           if (props.account?.id !== newAccount.id || props.account?.type !== 'apikey' || props.account?.platform !== 'kiro') {
