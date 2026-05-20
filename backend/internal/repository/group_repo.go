@@ -395,9 +395,6 @@ func (r *groupRepository) listWithAccountCountSort(ctx context.Context, q *dbent
 			entries[i].accountCount = c.Total
 		}
 	}
-	if err := r.hydrateKiroCacheEmulationFieldsForGroups(ctx, outGroups); err != nil {
-		return nil, nil, err
-	}
 
 	// 第三步：Go 侧排序（数据量 = Group 总数，通常 < 200，安全）。
 	sortOrder := params.NormalizedSortOrder(pagination.SortOrderDesc)
@@ -447,6 +444,10 @@ func (r *groupRepository) listWithAccountCountSort(ctx context.Context, q *dbent
 		if idx, ok := pageIdx[g.ID]; ok {
 			outGroups[idx] = *g
 		}
+	}
+
+	if err := r.hydrateKiroCacheEmulationFieldsForGroups(ctx, outGroups); err != nil {
+		return nil, nil, err
 	}
 
 	return outGroups, paginationResultFromTotal(int64(total), params), nil
