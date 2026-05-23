@@ -4469,7 +4469,7 @@ func (s *GatewayService) Forward(ctx context.Context, c *gin.Context, account *A
 
 	// Web Search 模拟：纯 web_search 请求时，直接调用搜索 API 构造响应。
 	// Kiro OAuth 在 forwardKiroMessages 内部完成模型映射后再判断，避免使用未映射的请求体。
-	if account != nil && !(account.Platform == PlatformKiro && account.Type == AccountTypeOAuth) && s.shouldEmulateWebSearch(ctx, account, parsed.GroupID, parsed.Body) {
+	if account != nil && (account.Platform != PlatformKiro || account.Type != AccountTypeOAuth) && s.shouldEmulateWebSearch(ctx, account, parsed.GroupID, parsed.Body) {
 		return s.handleWebSearchEmulation(ctx, c, account, parsed)
 	}
 
