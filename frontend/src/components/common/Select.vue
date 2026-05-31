@@ -10,6 +10,7 @@
       aria-label="Select option"
       :class="[
         'select-trigger',
+        size === 'sm' && 'select-trigger-sm',
         isOpen && 'select-trigger-open',
         error && 'select-trigger-error',
         disabled && 'select-trigger-disabled'
@@ -135,6 +136,7 @@ interface Props {
   labelKey?: string
   creatable?: boolean
   creatablePrefix?: string
+  size?: 'sm' | 'md'
 }
 
 interface Emits {
@@ -149,7 +151,8 @@ const props = withDefaults(defineProps<Props>(), {
   creatable: false,
   creatablePrefix: '',
   valueKey: 'value',
-  labelKey: 'label'
+  labelKey: 'label',
+  size: 'md'
 })
 
 const emit = defineEmits<Emits>()
@@ -444,6 +447,11 @@ onUnmounted(() => {
 
 .select-trigger-open {
   @apply border-primary-500 ring-2 ring-primary-500/30;
+}
+
+/* 紧凑尺寸：对齐原 input py-1 text-xs 的高度，用于内联紧凑下拉 */
+.select-trigger-sm {
+  @apply px-2.5 py-1 text-xs rounded-lg;
 }
 
 .select-trigger-error {
