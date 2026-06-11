@@ -2323,7 +2323,9 @@ export default {
         description: '仅对当前 Kiro 分组模拟 Anthropic Prompt Cache 用量。',
         enabled: '启用模拟缓存',
         ratio: '缓存比例',
-        ratioHint: '范围 0 到 1，例如 0.5 表示只生效一半模拟缓存 token。'
+        ratioHint: '范围 0 到 1，例如 0.5 表示只生效一半模拟缓存 token。',
+        stickyRouting: 'Kiro 账号粘性路由',
+        stickyRoutingHint: '当前分组已自动启用 Kiro 账号粘性路由：同一会话的多轮对话将固定路由到同一账号，确保 Kiro prompt cache 命中率。使用方：在请求头传 X-Session-ID 可显式绑定会话；未传时系统自动从 system prompt 提取稳定标识。'
       },
       imagePricing: {
         title: '图片生成计费',

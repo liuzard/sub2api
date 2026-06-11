@@ -636,6 +636,15 @@
 
         <!-- Kiro 模拟缓存配置 -->
         <div v-if="createForm.platform === 'kiro'" class="border-t pt-4">
+          <!-- 粘性路由说明 -->
+          <div class="mb-4 rounded-md bg-blue-50 dark:bg-blue-900/20 p-3">
+            <p class="text-xs font-medium text-blue-700 dark:text-blue-400 mb-0.5">
+              {{ t("admin.groups.kiroCache.stickyRouting") }}
+            </p>
+            <p class="text-xs text-blue-600 dark:text-blue-300">
+              {{ t("admin.groups.kiroCache.stickyRoutingHint") }}
+            </p>
+          </div>
           <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300">
             {{ t("admin.groups.kiroCache.title") }}
           </label>
@@ -1942,6 +1951,15 @@
 
         <!-- Kiro 模拟缓存配置 -->
         <div v-if="editForm.platform === 'kiro'" class="border-t pt-4">
+          <!-- 粘性路由说明 -->
+          <div class="mb-4 rounded-md bg-blue-50 dark:bg-blue-900/20 p-3">
+            <p class="text-xs font-medium text-blue-700 dark:text-blue-400 mb-0.5">
+              {{ t("admin.groups.kiroCache.stickyRouting") }}
+            </p>
+            <p class="text-xs text-blue-600 dark:text-blue-300">
+              {{ t("admin.groups.kiroCache.stickyRoutingHint") }}
+            </p>
+          </div>
           <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300">
             {{ t("admin.groups.kiroCache.title") }}
           </label>

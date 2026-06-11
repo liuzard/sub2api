@@ -233,6 +233,11 @@ type ParsedRequest struct {
 	MaxTokens       int             // max_tokens 值（用于探测请求拦截）
 	SessionContext  *SessionContext // 可选：请求上下文区分因子（nil 时行为不变）
 
+	// ExplicitSessionID 客户端通过 HTTP 请求头（X-Session-ID / Anthropic-Session-Id）
+	// 显式传递的会话标识符。由 Handler 层设置，不从请求体解析，因此 ReplaceBody 后保留。
+	// 一旦非空，GenerateSessionHash 将以最高优先级用它作为粘性会话 key（混入 APIKeyID 隔离用户）。
+	ExplicitSessionID string
+
 	protocol      string    // 当前 Body 的协议格式，用于 Body 替换后刷新 raw range
 	systemRange   jsonRange // system/systemInstruction.parts 的 raw JSON 范围，绑定 Body 当前内容
 	messagesRange jsonRange // messages/contents 的 raw JSON 范围，绑定 Body 当前内容

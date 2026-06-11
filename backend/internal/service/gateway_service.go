@@ -737,7 +737,25 @@ func (s *GatewayService) GenerateSessionHash(parsed *ParsedRequest) string {
 		return ""
 	}
 
-	// 1. 最高优先级：从 metadata.user_id 提取 session_xxx
+	// 0. 最高优先级：客户端通过 HTTP 请求头显式传递的 Session ID。
+	//    由 Handler 从 X-Session-ID / Anthropic-Session-Id 写入 ExplicitSessionID。
+	//    混入 APIKeyID 隔离不同用户使用相同 session id（如都用 "default"）的情况。
+	if parsed.ExplicitSessionID != "" {
+		var sb strings.Builder
+		if parsed.SessionContext != nil {
+			_, _ = sb.WriteString(strconv.FormatInt(parsed.SessionContext.APIKeyID, 10))
+			_, _ = sb.WriteString("|")
+		}
+		_, _ = sb.WriteString(parsed.ExplicitSessionID)
+		hash := s.hashContent(sb.String())
+		slog.Info("sticky.hash_source",
+			"source", "explicit_session_header",
+			"hash", hash,
+		)
+		return hash
+	}
+
+	// 1. 从 metadata.user_id 提取 session_xxx（Claude Code 等客户端的标准会话标识）
 	if parsed.MetadataUserID != "" {
 		uid := ParseMetadataUserID(parsed.MetadataUserID)
 		if uid != nil && uid.SessionID != "" {
@@ -766,6 +784,34 @@ func (s *GatewayService) GenerateSessionHash(parsed *ParsedRequest) string {
 		return hash
 	}
 
+	// 2.5. Kiro 分组专用：仅用 system prompt 内容做 hash
+	//
+	// 背景：Kiro 采用 stateless replay 架构，每次请求都生成新的 conversationId，
+	// 无法依赖 conversationId 做粘性。同时 Claude Code / cursor 等客户端通常
+	// 不传 metadata.user_id，也不使用 cache_control: ephemeral。
+	//
+	// 解法：system prompt 在整个会话生命周期内固定不变（Claude Code 会在第一条消息
+	// 里附上完整系统提示，后续轮次不变），而 messages 数组每轮都会追加新内容导致 hash
+	// 变化。因此，对于 Kiro 分组，只用 system prompt 文本 + APIKeyID 区分因子做 hash，
+	// 保证同一个会话的多轮对话始终路由到同一账号，让 Kiro prompt cache 生效。
+	if isKiroGroup(parsed.Group) {
+		if systemText := extractTextFromSystemRaw(parsed.SystemRaw()); systemText != "" {
+			var sb strings.Builder
+			if parsed.SessionContext != nil {
+				_, _ = sb.WriteString(strconv.FormatInt(parsed.SessionContext.APIKeyID, 10))
+				_, _ = sb.WriteString("|")
+			}
+			_, _ = sb.WriteString(systemText)
+			hash := s.hashContent(sb.String())
+			slog.Info("sticky.hash_source",
+				"source", "kiro_system_prompt",
+				"hash", hash,
+				"system_len", len(systemText),
+			)
+			return hash
+		}
+	}
+
 	// 3. 最后 fallback: 使用 session上下文 + system + 所有消息的完整摘要串
 	var combined strings.Builder
 	// 混入请求上下文区分因子，避免不同用户相同消息产生相同 hash
@@ -792,6 +838,11 @@ func (s *GatewayService) GenerateSessionHash(parsed *ParsedRequest) string {
 	}
 
 	return ""
+}
+
+// isKiroGroup 判断请求所属分组是否为 Kiro 平台分组。
+func isKiroGroup(group *Group) bool {
+	return group != nil && group.Platform == PlatformKiro
 }
 
 // BindStickySession sets session -> account binding with standard TTL.

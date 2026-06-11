@@ -273,6 +273,17 @@ func (h *GatewayHandler) Messages(c *gin.Context) {
 		APIKeyID:  apiKey.ID,
 		UserID:    subject.UserID,
 	}
+
+	// 优先从 HTTP 请求头提取显式 Session ID，作为粘性会话最高优先级标识。
+	// 支持两个 header，优先级：X-Session-ID > Anthropic-Session-Id。
+	// 写入独立字段 ExplicitSessionID（不污染 metadata.user_id，后者还用于客户端亲和调度），
+	// 让 Kiro 等分组的客户端可以显式传递稳定 session 标识符，避免依赖请求体内容 hash。
+	if headerSessionID := c.GetHeader("X-Session-ID"); headerSessionID != "" {
+		parsedReq.ExplicitSessionID = headerSessionID
+	} else if headerSessionID := c.GetHeader("Anthropic-Session-Id"); headerSessionID != "" {
+		parsedReq.ExplicitSessionID = headerSessionID
+	}
+
 	sessionHash := h.gatewayService.GenerateSessionHash(parsedReq)
 
 	// [DEBUG-STICKY] 打印会话 hash 生成结果

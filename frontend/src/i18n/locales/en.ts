@@ -2240,7 +2240,9 @@ export default {
         description: 'Simulate Anthropic prompt cache usage for this Kiro group only.',
         enabled: 'Enable cache emulation',
         ratio: 'Cache ratio',
-        ratioHint: '0 to 1. For example, 0.5 applies half of the simulated cache tokens.'
+        ratioHint: '0 to 1. For example, 0.5 applies half of the simulated cache tokens.',
+        stickyRouting: 'Kiro Account Sticky Routing',
+        stickyRoutingHint: 'This group has Kiro sticky routing enabled automatically: multi-turn conversations are pinned to the same account to maximize Kiro prompt cache hit rate. Pass X-Session-ID in the request header to explicitly bind a session; without it, the system derives a stable key from the system prompt.'
       },
       imagePricing: {
         title: 'Image Generation Pricing',
