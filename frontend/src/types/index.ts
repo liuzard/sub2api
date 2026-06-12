@@ -528,6 +528,8 @@ export interface Group {
   messages_dispatch_model_config?: OpenAIMessagesDispatchModelConfig
   require_oauth_only: boolean
   require_privacy_set: boolean
+  kiro_auto_sticky_enabled: boolean
+  kiro_sticky_session_ttl_seconds: number
   kiro_cache_emulation_enabled: boolean
   kiro_cache_emulation_ratio: number
   created_at: string
@@ -652,6 +654,8 @@ export interface CreateGroupRequest {
   rpm_limit?: number
   require_oauth_only?: boolean
   require_privacy_set?: boolean
+  kiro_auto_sticky_enabled?: boolean
+  kiro_sticky_session_ttl_seconds?: number
   kiro_cache_emulation_enabled?: boolean
   kiro_cache_emulation_ratio?: number
   // 从指定分组复制账号
@@ -689,6 +693,8 @@ export interface UpdateGroupRequest {
   rpm_limit?: number
   require_oauth_only?: boolean
   require_privacy_set?: boolean
+  kiro_auto_sticky_enabled?: boolean
+  kiro_sticky_session_ttl_seconds?: number
   kiro_cache_emulation_enabled?: boolean
   kiro_cache_emulation_ratio?: number
   copy_accounts_from_group_ids?: number[]
