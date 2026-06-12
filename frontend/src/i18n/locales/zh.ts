@@ -2325,7 +2325,9 @@ export default {
         ratio: '缓存比例',
         ratioHint: '范围 0 到 1，例如 0.5 表示只生效一半模拟缓存 token。',
         stickyRouting: '启用 Kiro 账号粘性路由',
-        stickyRoutingHint: '开启后，同一会话的多轮对话会尽量固定到同一账号；请求头传 X-Session-ID 时仍优先使用显式会话绑定。'
+        stickyRoutingHint: '开启后，同一会话的多轮对话会尽量固定到同一账号；请求头传 X-Session-ID 时仍优先使用显式会话绑定。',
+        stickyTTL: '粘性绑定时长（秒）',
+        stickyTTLHint: '同一会话空闲超过该时长后会重新选择账号。范围 60-86400，默认 3600。'
       },
       imagePricing: {
         title: '图片生成计费',

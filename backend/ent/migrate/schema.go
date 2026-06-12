@@ -674,6 +674,7 @@ var (
 		{Name: "rpm_limit", Type: field.TypeInt, Default: 0},
 		{Name: "kiro_cache_emulation_enabled", Type: field.TypeBool, Default: false},
 		{Name: "kiro_auto_sticky_enabled", Type: field.TypeBool, Default: true},
+		{Name: "kiro_sticky_session_ttl_seconds", Type: field.TypeInt, Default: 3600},
 		{Name: "kiro_cache_emulation_ratio", Type: field.TypeFloat64, Default: 1, SchemaType: map[string]string{"postgres": "decimal(5,4)"}},
 	}
 	// GroupsTable holds the schema information for the "groups" table.

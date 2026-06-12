@@ -220,6 +220,11 @@ func KiroAutoStickyEnabled(v bool) predicate.Group {
 	return predicate.Group(sql.FieldEQ(FieldKiroAutoStickyEnabled, v))
 }
 
+// KiroStickySessionTTLSeconds applies equality check predicate on the "kiro_sticky_session_ttl_seconds" field. It's identical to KiroStickySessionTTLSecondsEQ.
+func KiroStickySessionTTLSeconds(v int) predicate.Group {
+	return predicate.Group(sql.FieldEQ(FieldKiroStickySessionTTLSeconds, v))
+}
+
 // KiroCacheEmulationRatio applies equality check predicate on the "kiro_cache_emulation_ratio" field. It's identical to KiroCacheEmulationRatioEQ.
 func KiroCacheEmulationRatio(v float64) predicate.Group {
 	return predicate.Group(sql.FieldEQ(FieldKiroCacheEmulationRatio, v))
@@ -1473,6 +1478,46 @@ func KiroAutoStickyEnabledEQ(v bool) predicate.Group {
 // KiroAutoStickyEnabledNEQ applies the NEQ predicate on the "kiro_auto_sticky_enabled" field.
 func KiroAutoStickyEnabledNEQ(v bool) predicate.Group {
 	return predicate.Group(sql.FieldNEQ(FieldKiroAutoStickyEnabled, v))
+}
+
+// KiroStickySessionTTLSecondsEQ applies the EQ predicate on the "kiro_sticky_session_ttl_seconds" field.
+func KiroStickySessionTTLSecondsEQ(v int) predicate.Group {
+	return predicate.Group(sql.FieldEQ(FieldKiroStickySessionTTLSeconds, v))
+}
+
+// KiroStickySessionTTLSecondsNEQ applies the NEQ predicate on the "kiro_sticky_session_ttl_seconds" field.
+func KiroStickySessionTTLSecondsNEQ(v int) predicate.Group {
+	return predicate.Group(sql.FieldNEQ(FieldKiroStickySessionTTLSeconds, v))
+}
+
+// KiroStickySessionTTLSecondsIn applies the In predicate on the "kiro_sticky_session_ttl_seconds" field.
+func KiroStickySessionTTLSecondsIn(vs ...int) predicate.Group {
+	return predicate.Group(sql.FieldIn(FieldKiroStickySessionTTLSeconds, vs...))
+}
+
+// KiroStickySessionTTLSecondsNotIn applies the NotIn predicate on the "kiro_sticky_session_ttl_seconds" field.
+func KiroStickySessionTTLSecondsNotIn(vs ...int) predicate.Group {
+	return predicate.Group(sql.FieldNotIn(FieldKiroStickySessionTTLSeconds, vs...))
+}
+
+// KiroStickySessionTTLSecondsGT applies the GT predicate on the "kiro_sticky_session_ttl_seconds" field.
+func KiroStickySessionTTLSecondsGT(v int) predicate.Group {
+	return predicate.Group(sql.FieldGT(FieldKiroStickySessionTTLSeconds, v))
+}
+
+// KiroStickySessionTTLSecondsGTE applies the GTE predicate on the "kiro_sticky_session_ttl_seconds" field.
+func KiroStickySessionTTLSecondsGTE(v int) predicate.Group {
+	return predicate.Group(sql.FieldGTE(FieldKiroStickySessionTTLSeconds, v))
+}
+
+// KiroStickySessionTTLSecondsLT applies the LT predicate on the "kiro_sticky_session_ttl_seconds" field.
+func KiroStickySessionTTLSecondsLT(v int) predicate.Group {
+	return predicate.Group(sql.FieldLT(FieldKiroStickySessionTTLSeconds, v))
+}
+
+// KiroStickySessionTTLSecondsLTE applies the LTE predicate on the "kiro_sticky_session_ttl_seconds" field.
+func KiroStickySessionTTLSecondsLTE(v int) predicate.Group {
+	return predicate.Group(sql.FieldLTE(FieldKiroStickySessionTTLSeconds, v))
 }
 
 // KiroCacheEmulationRatioEQ applies the EQ predicate on the "kiro_cache_emulation_ratio" field.

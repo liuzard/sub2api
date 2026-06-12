@@ -231,9 +231,10 @@ type CreateGroupInput struct {
 	// RPMLimit 分组 RPM 上限（0 = 不限制）
 	RPMLimit int
 	// Kiro 模拟缓存配置（仅 kiro 分组生效）
-	KiroCacheEmulationEnabled bool
-	KiroAutoStickyEnabled     *bool
-	KiroCacheEmulationRatio   *float64
+	KiroCacheEmulationEnabled   bool
+	KiroAutoStickyEnabled       *bool
+	KiroStickySessionTTLSeconds *int
+	KiroCacheEmulationRatio     *float64
 	// 从指定分组复制账号（创建分组后在同一事务内绑定）
 	CopyAccountsFromGroupIDs []int64
 }
@@ -276,9 +277,10 @@ type UpdateGroupInput struct {
 	// RPMLimit 分组 RPM 上限（0 = 不限制），nil 表示未提供不改动。
 	RPMLimit *int
 	// Kiro 模拟缓存配置（仅 kiro 分组生效）
-	KiroCacheEmulationEnabled *bool
-	KiroAutoStickyEnabled     *bool
-	KiroCacheEmulationRatio   *float64
+	KiroCacheEmulationEnabled   *bool
+	KiroAutoStickyEnabled       *bool
+	KiroStickySessionTTLSeconds *int
+	KiroCacheEmulationRatio     *float64
 	// 从指定分组复制账号（同步操作：先清空当前分组的账号绑定，再绑定源分组的账号）
 	CopyAccountsFromGroupIDs []int64
 }
@@ -1922,6 +1924,9 @@ func (s *adminServiceImpl) CreateGroup(ctx context.Context, input *CreateGroupIn
 		KiroCacheEmulationEnabled:       input.KiroCacheEmulationEnabled,
 		KiroAutoStickyEnabled:           kiroAutoStickyEnabled,
 	}
+	if input.KiroStickySessionTTLSeconds != nil {
+		group.KiroStickySessionTTLSeconds = *input.KiroStickySessionTTLSeconds
+	}
 	if input.KiroCacheEmulationRatio != nil {
 		group.KiroCacheEmulationRatio = *input.KiroCacheEmulationRatio
 	}
@@ -2182,6 +2187,9 @@ func (s *adminServiceImpl) UpdateGroup(ctx context.Context, id int64, input *Upd
 	}
 	if input.KiroAutoStickyEnabled != nil {
 		group.KiroAutoStickyEnabled = *input.KiroAutoStickyEnabled
+	}
+	if input.KiroStickySessionTTLSeconds != nil {
+		group.KiroStickySessionTTLSeconds = *input.KiroStickySessionTTLSeconds
 	}
 	if input.KiroCacheEmulationRatio != nil {
 		group.KiroCacheEmulationRatio = *input.KiroCacheEmulationRatio

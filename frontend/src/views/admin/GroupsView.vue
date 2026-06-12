@@ -652,6 +652,19 @@
               </span>
             </span>
           </label>
+          <div v-if="createForm.kiro_auto_sticky_enabled" class="mb-4">
+            <label class="input-label">{{ t("admin.groups.kiroCache.stickyTTL") }}</label>
+            <input
+              v-model.number="createForm.kiro_sticky_session_ttl_seconds"
+              type="number"
+              step="60"
+              min="60"
+              max="86400"
+              class="input"
+              placeholder="3600"
+            />
+            <p class="input-hint">{{ t("admin.groups.kiroCache.stickyTTLHint") }}</p>
+          </div>
           <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300">
             {{ t("admin.groups.kiroCache.title") }}
           </label>
@@ -1974,6 +1987,19 @@
               </span>
             </span>
           </label>
+          <div v-if="editForm.kiro_auto_sticky_enabled" class="mb-4">
+            <label class="input-label">{{ t("admin.groups.kiroCache.stickyTTL") }}</label>
+            <input
+              v-model.number="editForm.kiro_sticky_session_ttl_seconds"
+              type="number"
+              step="60"
+              min="60"
+              max="86400"
+              class="input"
+              placeholder="3600"
+            />
+            <p class="input-hint">{{ t("admin.groups.kiroCache.stickyTTLHint") }}</p>
+          </div>
           <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300">
             {{ t("admin.groups.kiroCache.title") }}
           </label>
@@ -3453,6 +3479,7 @@ const createForm = reactive({
   // Kiro 模拟缓存配置（仅 Kiro 平台）
   kiro_cache_emulation_enabled: false,
   kiro_auto_sticky_enabled: true,
+  kiro_sticky_session_ttl_seconds: 3600,
   kiro_cache_emulation_ratio: 1,
 });
 
@@ -3789,6 +3816,7 @@ const editForm = reactive({
   // Kiro 模拟缓存配置（仅 Kiro 平台）
   kiro_cache_emulation_enabled: false,
   kiro_auto_sticky_enabled: true,
+  kiro_sticky_session_ttl_seconds: 3600,
   kiro_cache_emulation_ratio: 1,
 });
 
@@ -4029,6 +4057,7 @@ const closeCreateModal = () => {
   createForm.rpm_limit = 0;
   createForm.kiro_cache_emulation_enabled = false;
   createForm.kiro_auto_sticky_enabled = true;
+  createForm.kiro_sticky_session_ttl_seconds = 3600;
   createForm.kiro_cache_emulation_ratio = 1;
   resetModelsListState(createModelsListState);
   createModelRoutingRules.value = [];
@@ -4061,6 +4090,16 @@ const normalizeImageRateMultiplier = (
   }
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : 1;
+};
+
+const normalizeKiroStickySessionTTL = (
+  value: number | string | null | undefined,
+): number => {
+  const seconds = Number(value);
+  if (!Number.isFinite(seconds) || seconds <= 0) {
+    return 3600;
+  }
+  return Math.min(86400, Math.max(60, Math.trunc(seconds)));
 };
 
 const handleCreateGroup = async () => {
@@ -4111,8 +4150,13 @@ const handleCreateGroup = async () => {
     );
     if (requestData.platform !== "kiro") {
       requestData.kiro_auto_sticky_enabled = false;
+      requestData.kiro_sticky_session_ttl_seconds = 0;
       requestData.kiro_cache_emulation_enabled = false;
       requestData.kiro_cache_emulation_ratio = 0;
+    } else {
+      requestData.kiro_sticky_session_ttl_seconds = normalizeKiroStickySessionTTL(
+        requestData.kiro_sticky_session_ttl_seconds,
+      );
     }
     await adminAPI.groups.create(requestData);
     appStore.showSuccess(t("admin.groups.groupCreated"));
@@ -4179,6 +4223,8 @@ const handleEdit = async (group: AdminGroup) => {
   editForm.rpm_limit = group.rpm_limit ?? 0;
   editForm.kiro_auto_sticky_enabled =
     group.kiro_auto_sticky_enabled ?? group.platform === "kiro";
+  editForm.kiro_sticky_session_ttl_seconds =
+    group.kiro_sticky_session_ttl_seconds ?? 3600;
   editForm.kiro_cache_emulation_enabled = group.kiro_cache_emulation_enabled ?? false;
   editForm.kiro_cache_emulation_ratio = group.kiro_cache_emulation_ratio ?? 1;
   resetModelsListState(editModelsListState, group.models_list_config);
@@ -4259,8 +4305,13 @@ const handleUpdateGroup = async () => {
     );
     if (payload.platform !== "kiro") {
       payload.kiro_auto_sticky_enabled = false;
+      payload.kiro_sticky_session_ttl_seconds = 0;
       payload.kiro_cache_emulation_enabled = false;
       payload.kiro_cache_emulation_ratio = 0;
+    } else {
+      payload.kiro_sticky_session_ttl_seconds = normalizeKiroStickySessionTTL(
+        payload.kiro_sticky_session_ttl_seconds,
+      );
     }
     await adminAPI.groups.update(editingGroup.value.id, payload);
     appStore.showSuccess(t("admin.groups.groupUpdated"));

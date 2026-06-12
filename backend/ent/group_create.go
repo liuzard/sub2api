@@ -523,6 +523,20 @@ func (_c *GroupCreate) SetNillableKiroAutoStickyEnabled(v *bool) *GroupCreate {
 	return _c
 }
 
+// SetKiroStickySessionTTLSeconds sets the "kiro_sticky_session_ttl_seconds" field.
+func (_c *GroupCreate) SetKiroStickySessionTTLSeconds(v int) *GroupCreate {
+	_c.mutation.SetKiroStickySessionTTLSeconds(v)
+	return _c
+}
+
+// SetNillableKiroStickySessionTTLSeconds sets the "kiro_sticky_session_ttl_seconds" field if the given value is not nil.
+func (_c *GroupCreate) SetNillableKiroStickySessionTTLSeconds(v *int) *GroupCreate {
+	if v != nil {
+		_c.SetKiroStickySessionTTLSeconds(*v)
+	}
+	return _c
+}
+
 // SetKiroCacheEmulationRatio sets the "kiro_cache_emulation_ratio" field.
 func (_c *GroupCreate) SetKiroCacheEmulationRatio(v float64) *GroupCreate {
 	_c.mutation.SetKiroCacheEmulationRatio(v)
@@ -770,6 +784,10 @@ func (_c *GroupCreate) defaults() error {
 		v := group.DefaultKiroAutoStickyEnabled
 		_c.mutation.SetKiroAutoStickyEnabled(v)
 	}
+	if _, ok := _c.mutation.KiroStickySessionTTLSeconds(); !ok {
+		v := group.DefaultKiroStickySessionTTLSeconds
+		_c.mutation.SetKiroStickySessionTTLSeconds(v)
+	}
 	if _, ok := _c.mutation.KiroCacheEmulationRatio(); !ok {
 		v := group.DefaultKiroCacheEmulationRatio
 		_c.mutation.SetKiroCacheEmulationRatio(v)
@@ -881,6 +899,9 @@ func (_c *GroupCreate) check() error {
 	}
 	if _, ok := _c.mutation.KiroAutoStickyEnabled(); !ok {
 		return &ValidationError{Name: "kiro_auto_sticky_enabled", err: errors.New(`ent: missing required field "Group.kiro_auto_sticky_enabled"`)}
+	}
+	if _, ok := _c.mutation.KiroStickySessionTTLSeconds(); !ok {
+		return &ValidationError{Name: "kiro_sticky_session_ttl_seconds", err: errors.New(`ent: missing required field "Group.kiro_sticky_session_ttl_seconds"`)}
 	}
 	if _, ok := _c.mutation.KiroCacheEmulationRatio(); !ok {
 		return &ValidationError{Name: "kiro_cache_emulation_ratio", err: errors.New(`ent: missing required field "Group.kiro_cache_emulation_ratio"`)}
@@ -1059,6 +1080,10 @@ func (_c *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.KiroAutoStickyEnabled(); ok {
 		_spec.SetField(group.FieldKiroAutoStickyEnabled, field.TypeBool, value)
 		_node.KiroAutoStickyEnabled = value
+	}
+	if value, ok := _c.mutation.KiroStickySessionTTLSeconds(); ok {
+		_spec.SetField(group.FieldKiroStickySessionTTLSeconds, field.TypeInt, value)
+		_node.KiroStickySessionTTLSeconds = value
 	}
 	if value, ok := _c.mutation.KiroCacheEmulationRatio(); ok {
 		_spec.SetField(group.FieldKiroCacheEmulationRatio, field.TypeFloat64, value)
@@ -1796,6 +1821,24 @@ func (u *GroupUpsert) UpdateKiroAutoStickyEnabled() *GroupUpsert {
 	return u
 }
 
+// SetKiroStickySessionTTLSeconds sets the "kiro_sticky_session_ttl_seconds" field.
+func (u *GroupUpsert) SetKiroStickySessionTTLSeconds(v int) *GroupUpsert {
+	u.Set(group.FieldKiroStickySessionTTLSeconds, v)
+	return u
+}
+
+// UpdateKiroStickySessionTTLSeconds sets the "kiro_sticky_session_ttl_seconds" field to the value that was provided on create.
+func (u *GroupUpsert) UpdateKiroStickySessionTTLSeconds() *GroupUpsert {
+	u.SetExcluded(group.FieldKiroStickySessionTTLSeconds)
+	return u
+}
+
+// AddKiroStickySessionTTLSeconds adds v to the "kiro_sticky_session_ttl_seconds" field.
+func (u *GroupUpsert) AddKiroStickySessionTTLSeconds(v int) *GroupUpsert {
+	u.Add(group.FieldKiroStickySessionTTLSeconds, v)
+	return u
+}
+
 // SetKiroCacheEmulationRatio sets the "kiro_cache_emulation_ratio" field.
 func (u *GroupUpsert) SetKiroCacheEmulationRatio(v float64) *GroupUpsert {
 	u.Set(group.FieldKiroCacheEmulationRatio, v)
@@ -2528,6 +2571,27 @@ func (u *GroupUpsertOne) SetKiroAutoStickyEnabled(v bool) *GroupUpsertOne {
 func (u *GroupUpsertOne) UpdateKiroAutoStickyEnabled() *GroupUpsertOne {
 	return u.Update(func(s *GroupUpsert) {
 		s.UpdateKiroAutoStickyEnabled()
+	})
+}
+
+// SetKiroStickySessionTTLSeconds sets the "kiro_sticky_session_ttl_seconds" field.
+func (u *GroupUpsertOne) SetKiroStickySessionTTLSeconds(v int) *GroupUpsertOne {
+	return u.Update(func(s *GroupUpsert) {
+		s.SetKiroStickySessionTTLSeconds(v)
+	})
+}
+
+// AddKiroStickySessionTTLSeconds adds v to the "kiro_sticky_session_ttl_seconds" field.
+func (u *GroupUpsertOne) AddKiroStickySessionTTLSeconds(v int) *GroupUpsertOne {
+	return u.Update(func(s *GroupUpsert) {
+		s.AddKiroStickySessionTTLSeconds(v)
+	})
+}
+
+// UpdateKiroStickySessionTTLSeconds sets the "kiro_sticky_session_ttl_seconds" field to the value that was provided on create.
+func (u *GroupUpsertOne) UpdateKiroStickySessionTTLSeconds() *GroupUpsertOne {
+	return u.Update(func(s *GroupUpsert) {
+		s.UpdateKiroStickySessionTTLSeconds()
 	})
 }
 
@@ -3432,6 +3496,27 @@ func (u *GroupUpsertBulk) SetKiroAutoStickyEnabled(v bool) *GroupUpsertBulk {
 func (u *GroupUpsertBulk) UpdateKiroAutoStickyEnabled() *GroupUpsertBulk {
 	return u.Update(func(s *GroupUpsert) {
 		s.UpdateKiroAutoStickyEnabled()
+	})
+}
+
+// SetKiroStickySessionTTLSeconds sets the "kiro_sticky_session_ttl_seconds" field.
+func (u *GroupUpsertBulk) SetKiroStickySessionTTLSeconds(v int) *GroupUpsertBulk {
+	return u.Update(func(s *GroupUpsert) {
+		s.SetKiroStickySessionTTLSeconds(v)
+	})
+}
+
+// AddKiroStickySessionTTLSeconds adds v to the "kiro_sticky_session_ttl_seconds" field.
+func (u *GroupUpsertBulk) AddKiroStickySessionTTLSeconds(v int) *GroupUpsertBulk {
+	return u.Update(func(s *GroupUpsert) {
+		s.AddKiroStickySessionTTLSeconds(v)
+	})
+}
+
+// UpdateKiroStickySessionTTLSeconds sets the "kiro_sticky_session_ttl_seconds" field to the value that was provided on create.
+func (u *GroupUpsertBulk) UpdateKiroStickySessionTTLSeconds() *GroupUpsertBulk {
+	return u.Update(func(s *GroupUpsert) {
+		s.UpdateKiroStickySessionTTLSeconds()
 	})
 }
 
