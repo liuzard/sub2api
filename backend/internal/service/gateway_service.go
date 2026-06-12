@@ -738,20 +738,9 @@ func (s *GatewayService) GenerateSessionHash(parsed *ParsedRequest) string {
 	}
 
 	// 0. 最高优先级：客户端通过 HTTP 请求头显式传递的 Session ID。
-	//    由 Handler 从 X-Session-ID / Anthropic-Session-Id 写入 ExplicitSessionID。
+	//    由 Handler 从 X-Session-ID / Anthropic-Session-Id 等 header 写入 ExplicitSessionID。
 	//    混入 APIKeyID 隔离不同用户使用相同 session id（如都用 "default"）的情况。
-	if parsed.ExplicitSessionID != "" {
-		var sb strings.Builder
-		if parsed.SessionContext != nil {
-			_, _ = sb.WriteString(strconv.FormatInt(parsed.SessionContext.APIKeyID, 10))
-			_, _ = sb.WriteString("|")
-		}
-		_, _ = sb.WriteString(parsed.ExplicitSessionID)
-		hash := s.hashContent(sb.String())
-		slog.Info("sticky.hash_source",
-			"source", "explicit_session_header",
-			"hash", hash,
-		)
+	if hash, ok := s.hashStickySessionHint(parsed, parsed.ExplicitSessionID, "explicit_session_header"); ok {
 		return hash
 	}
 
@@ -771,6 +760,12 @@ func (s *GatewayService) GenerateSessionHash(parsed *ParsedRequest) string {
 			"metadata_user_id", parsed.MetadataUserID,
 			"parsed_nil", uid == nil,
 		)
+	}
+
+	// 1.5. 从请求体提取客户端已经提供的稳定会话标识。
+	// 支持 prompt_cache_key/conversation_id/thread_id/session_id 及 metadata 下同名字段。
+	if hash, ok := s.hashStickySessionHint(parsed, parsed.BodySessionID, "body_session_id"); ok {
+		return hash
 	}
 
 	// 2. 提取带 cache_control: {type: "ephemeral"} 的内容
@@ -850,6 +845,26 @@ func (s *GatewayService) GenerateSessionHash(parsed *ParsedRequest) string {
 	}
 
 	return ""
+}
+
+func (s *GatewayService) hashStickySessionHint(parsed *ParsedRequest, sessionID, source string) (string, bool) {
+	sessionID = strings.TrimSpace(sessionID)
+	if sessionID == "" {
+		return "", false
+	}
+
+	var sb strings.Builder
+	if parsed != nil && parsed.SessionContext != nil {
+		_, _ = sb.WriteString(strconv.FormatInt(parsed.SessionContext.APIKeyID, 10))
+		_, _ = sb.WriteString("|")
+	}
+	_, _ = sb.WriteString(sessionID)
+	hash := s.hashContent(sb.String())
+	slog.Info("sticky.hash_source",
+		"source", source,
+		"hash", hash,
+	)
+	return hash, true
 }
 
 // isKiroGroup 判断请求所属分组是否为 Kiro 平台分组。

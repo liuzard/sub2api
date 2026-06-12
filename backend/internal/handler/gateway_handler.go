@@ -36,6 +36,30 @@ const gatewayCompatibilityMetricsLogInterval = 1024
 
 var gatewayCompatibilityMetricsLogCounter atomic.Uint64
 
+var stickySessionHeaderNames = []string{
+	"X-Session-ID",
+	"Anthropic-Session-Id",
+	"X-Claude-Code-Session-Id",
+	"X-OpenCode-Session",
+	"X-Session-Affinity",
+	"X-Conversation-ID",
+	"Session-Id",
+	"session_id",
+	"conversation_id",
+}
+
+func explicitStickySessionIDFromHeaders(c *gin.Context) string {
+	if c == nil {
+		return ""
+	}
+	for _, name := range stickySessionHeaderNames {
+		if value := strings.TrimSpace(c.GetHeader(name)); value != "" {
+			return value
+		}
+	}
+	return ""
+}
+
 // GatewayHandler handles API gateway requests
 type GatewayHandler struct {
 	gatewayService            *service.GatewayService
@@ -275,14 +299,9 @@ func (h *GatewayHandler) Messages(c *gin.Context) {
 	}
 
 	// 优先从 HTTP 请求头提取显式 Session ID，作为粘性会话最高优先级标识。
-	// 支持两个 header，优先级：X-Session-ID > Anthropic-Session-Id。
 	// 写入独立字段 ExplicitSessionID（不污染 metadata.user_id，后者还用于客户端亲和调度），
 	// 让 Kiro 等分组的客户端可以显式传递稳定 session 标识符，避免依赖请求体内容 hash。
-	if headerSessionID := c.GetHeader("X-Session-ID"); headerSessionID != "" {
-		parsedReq.ExplicitSessionID = headerSessionID
-	} else if headerSessionID := c.GetHeader("Anthropic-Session-Id"); headerSessionID != "" {
-		parsedReq.ExplicitSessionID = headerSessionID
-	}
+	parsedReq.ExplicitSessionID = explicitStickySessionIDFromHeaders(c)
 
 	sessionHash := h.gatewayService.GenerateSessionHash(parsedReq)
 
@@ -1802,6 +1821,7 @@ func (h *GatewayHandler) CountTokens(c *gin.Context) {
 		APIKeyID:  apiKey.ID,
 		UserID:    subject.UserID,
 	}
+	parsedReq.ExplicitSessionID = explicitStickySessionIDFromHeaders(c)
 	sessionHash := h.gatewayService.GenerateSessionHash(parsedReq)
 
 	// 选择支持该模型的账号
